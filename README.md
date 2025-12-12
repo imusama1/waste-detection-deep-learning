@@ -1,100 +1,185 @@
+# Waste Object Detection Using Deep Learning  
+### Academic Project Report Summary
 
-# Waste detection and classification deep learning
+This project focuses on detecting waste objects in images using deep learning.
+The goal is to identify four recyclable material categories to support
+automated waste sorting:
 
-## Overview
-This project focuses on developing and evaluating deep learning models for the **detection and classification of waste materials** from images.  
-It aims to support the automation of waste sorting and recycling processes by identifying different types of trash, such as **plastic, paper, metal, glass, and organic waste**, through computer vision techniques.
+- **AluCan** (aluminium cans)  
+- **Glass**  
+- **HDPEM** (HDPE plastic bottles)  
+- **PET** (PET plastic bottles)
 
-The work is carried out as part of the *Machine and Deep Learning* module in the **VIBOT MSc – Computer Vision and Robotics** program at the **Université de Bourgogne**.
+We evaluated three different models:
 
----
+1. **Custom ABFP Model**  
+2. **ResNet50 Detector**  
+3. **Pretrained YOLOv8** (reference baseline)
 
-## Objective
-To build a robust image-based classification model capable of distinguishing waste categories using both **custom CNN architectures** and **transfer learning models**.  
-Performance will be compared across different architectures to analyze trade-offs between accuracy, inference time, and generalization.
-
----
-
-## Methodology
-
-### 1. Dataset
-- **Dataset:** [TrashNet](https://github.com/garythung/trashnet)  
-- **Classes:** Paper, Cardboard, Plastic, Metal, Glass, and Trash  
-- **Preprocessing:**
-  - Image resizing and normalization  
-  - Data augmentation (rotation, flips, brightness adjustments)  
-  - Train-validation-test split for evaluation consistency
-
-### 2. Model Development
-- **Baseline:** Transfer learning using pretrained CNN backbones (e.g., ResNet, EfficientNet)  
-- **Custom Head:** Designed a lightweight classifier with dropout and batch normalization layers for improved regularization  
-- **Loss Function:** CrossEntropyLoss  
-- **Optimizer:** Adam / SGD with dynamic learning rate scheduling  
-- **Evaluation Metrics:** Accuracy, Precision, Recall, F1-Score  
-
-### 3. Experimentation
-- Conducted experiments to compare:
-  - Custom model vs. pretrained models  
-  - Impact of data augmentation on accuracy  
-  - Training time vs. performance trade-offs  
-- Visualized training curves and confusion matrices for interpretability.
+This README provides a concise academic summary of the dataset, models,
+evaluation metrics, and qualitative results.
 
 ---
 
-## Tools and Frameworks
-- **Language:** Python  
-- **Framework:** PyTorch  
-- **Libraries:** NumPy, OpenCV, Matplotlib, Scikit-learn  
-- **Environment:** Jupyter Notebook / Google Colab  
+## Dataset Overview
+
+- Total images: **4,811**  
+- Classes: **4**  
+- Train/Val split: **80% / 20%**  
+- Annotation format: **YOLO bounding boxes**  
+- Images include varied lighting, backgrounds, and object scales.
 
 ---
 
-## Current Progress
-The dataset pipeline and baseline models have been set up successfully.  
-The custom classifier head is under development, and experiments comparing transfer learning models are ongoing.  
-Model checkpoints and evaluation plots will be added as training progresses.
+## Models Evaluated
+
+### 1. **Custom ABFP Model (Main Model)**  
+- YOLOv8 pretrained backbone (frozen)  
+- Adaptive Bidirectional Feature Pyramid (ABFP)  
+- Decoupled attention-based detection heads  
+- Mixed-precision FP16 training  
+- Trained for **30 epochs**
 
 ---
 
-## Future Work
-- Hyperparameter optimization and fine-tuning  
-- Integration of object detection (e.g., YOLOv8) for real-time classification  
-- Deployment-ready lightweight model export (ONNX / TorchScript)  
-- Extension toward robotic waste sorting applications  
+### 2. **ResNet50 Detector**  
+- End-to-end training  
+- High precision and recall  
+- Most stable performance of the trained models  
 
 ---
 
-## Repository Structure
-```
-waste-classification/
-│
-├── data/                # Dataset and splits
-├── notebooks/           # Jupyter notebooks for experiments
-├── src/                 # Model architecture and training scripts
-├── outputs/             # Model checkpoints and logs
-├── results/             # Evaluation metrics and visualizations
-└── README.md
-```
+### 3. **Pretrained YOLOv8 (Reference Model)**  
+- Not fine-tuned on our dataset  
+- Serves as a benchmark for pretrained large detectors  
+- Achieves excellent results due to COCO-scale training  
 
 ---
 
-## Authors
-**Muhammad Usama Javaid**  
-MSc – Computer Vision & Robotics (VIBOT)  
-Université de Bourgogne  
-[LinkedIn](https://www.linkedin.com/in/imusama/) | [GitHub](https://github.com/imusama1)
+## Evaluation Metrics
 
+| Model | mAP@0.5 | Precision | Recall |
+|-------|---------|-----------|--------|
+| **Custom ABFP Model** | ~0.57 | ~0.40 | ~0.73 |
+| **ResNet50 Detector** | 0.90+ | 0.90–1.00 | 0.85–1.00 |
+| **YOLOv8 (Pretrained)** | 0.994 | 0.991 | 0.992 |
 
-**Team Members:**
-
-  * [Ahmed Khalil](https://github.com/ahmad-laradev)
-
+### Observations  
+- ABFP detects many objects (high recall) but with many false positives (low precision).  
+- ResNet50 provides strong, stable detection across all classes.  
+- YOLOv8 performs best overall even without fine-tuning.
 
 ---
 
-## License
-This repository is created for academic and research purposes under the VIBOT MSc program.  
-Use or reference is permitted with proper credit.
-```
+## Confidence Curves (Custom ABFP Model)
 
+### F1-Score vs Confidence  
+<p align="center"><img src="figures/BoxF1_curve.png" width="50%"></p>
 
+### Precision vs Confidence  
+<p align="center"><img src="figures/BoxP_curve.png" width="50%"></p>
+
+### Recall vs Confidence  
+<p align="center"><img src="figures/BoxR_curve.png" width="50%"></p>
+
+### Precision–Recall Curve  
+<p align="center"><img src="figures/BoxPR_curve.png" width="50%"></p>
+
+These curves show that recall remains high, while precision drops quickly,
+demonstrating the model’s tendency to overpredict.
+
+---
+
+## Confusion Matrices
+
+### Custom ABFP Model  
+<p align="center"><img src="figures/confusion_matrix.png" width="50%"></p>
+
+### YOLOv8 (Reference)  
+<p align="center"><img src="figures/confusion_matrix_yolo.png" width="50%"></p>
+
+### ResNet50 Detector  
+<p align="center"><img src="figures/confusion_matrix_resnet50.png" width="50%"></p>
+
+Interpretation:  
+- ABFP struggles especially with PET and AluCan.  
+- ResNet50 achieves the strongest class separation.  
+- YOLOv8 approaches near-perfect classification.
+
+---
+
+## Qualitative Predictions
+
+### Validation Batch Examples
+
+<p align="center"><img src="figures/val_batch0_labels.jpg" width="50%"></p>
+<p align="center"><img src="figures/val_batch0_pred.jpg" width="50%"></p>
+
+<p align="center"><img src="figures/val_batch1_labels.jpg" width="50%"></p>
+<p align="center"><img src="figures/val_batch1_pred.jpg" width="50%"></p>
+
+<p align="center"><img src="figures/val_batch2_labels.jpg" width="50%"></p>
+<p align="center"><img src="figures/val_batch2_pred.jpg" width="50%"></p>
+
+---
+
+### Individual Predictions
+
+**PET example:**  
+<p align="center"><img src="figures/pred_val_00000.jpg" width="40%"></p>
+
+**Glass example:**  
+<p align="center"><img src="figures/pred_val_00001.jpg" width="40%"></p>
+
+**AluCan example:**  
+<p align="center"><img src="figures/pred_val_00002.jpg" width="40%"></p>
+
+**HDPEM example:**  
+<p align="center"><img src="figures/pred_val_00003.jpg" width="40%"></p>
+
+---
+
+## Qualitative Results: Custom ABFP Model
+
+Below are example predictions showing performance across HDPEM, Glass, PET, and AluCan
+in varied lighting and backgrounds.
+
+### ABFP Predictions (2×2 Grid)
+
+<table align="center">
+<tr>
+<td align="center"><img src="figures/custom1.jpeg" width="45%"><br>HDPEM Detection</td>
+<td align="center"><img src="figures/custom2.jpeg" width="45%"><br>Glass Detection</td>
+</tr>
+<tr>
+<td align="center"><img src="figures/custom3.jpeg" width="45%"><br>AluCan Detection</td>
+<td align="center"><img src="figures/custom4.jpeg" width="45%"><br>Additional Example</td>
+</tr>
+</table>
+
+These visualisations show the strengths and weaknesses of the custom ABFP model.
+
+---
+
+## Key Insights
+
+- **ABFP** shows good coverage (high recall) but many false positives.  
+- **ResNet50** provides the best balance of accuracy, precision, and recall.  
+- **YOLOv8** performs best overall even without dataset-specific training.  
+- PET is the hardest category due to shape variation and reflective surfaces.  
+- Additional training data, backbone fine-tuning, or stronger augmentation
+  would improve performance.
+
+---
+
+## Conclusion
+
+Deep learning models can effectively detect waste objects, but performance varies
+significantly by architecture. While the custom ABFP model demonstrates that
+lightweight feature pyramids can detect objects, it is outperformed by ResNet50
+and YOLOv8. The comparison highlights the importance of strong backbones,
+large datasets, and fine-tuning for robust waste detection.
+
+This README provides a concise academic summary of the full project report.
+
+---

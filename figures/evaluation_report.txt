@@ -1,0 +1,76 @@
+======================================================================
+WASTE DETECTION MODEL - EVALUATION REPORT
+Generated: 2025-12-11 21:27:14
+======================================================================
+
+📊 DATASET DETAILS
+--------------------------------------------------
+Dataset name: Custom Waste Dataset (YOLO format)
+Total images: 4811
+Train/Val split: 80/20
+Classes: AluCan, Glass, HDPEM, PET
+Image size: 640x640
+
+🏗️ MODEL ARCHITECTURE
+--------------------------------------------------
+Backbone: YOLOv8s (pretrained, frozen)
+Neck: Adaptive Bidirectional Feature Pyramid (ABFP) - Custom
+  - Learnable fusion weights
+  - Channel attention at fusion points
+  - Cross-scale skip connections
+  - Depthwise separable convolutions
+Head: Decoupled Attention Head - Custom
+  - Separate classification/regression branches
+  - Spatial attention before predictions
+  - Anchor-free design
+Total parameters: 8,177,149
+Trainable parameters: 3,097,437
+
+⚙️ TRAINING SETUP
+--------------------------------------------------
+Optimizer: AdamW
+Learning rate: 1e-3
+LR Scheduler: CosineAnnealingLR
+Batch size: 8
+Epochs: 20
+Loss: Focal Loss (cls) + Smooth L1 (reg) + BCE (obj)
+Best validation loss: 0.2161
+Hardware: NVIDIA GeForce RTX 3060 Laptop GPU
+
+📈 EVALUATION METRICS
+--------------------------------------------------
+mAP@0.5: 63.40%
+Overall Precision: 57.68%
+Overall Recall: 72.69%
+Overall F1-Score: 64.32%
+
+📊 PER-CLASS METRICS
+--------------------------------------------------
+Class       Precision   Recall      F1-Score    AP          
+--------------------------------------------------
+AluCan         60.66%      62.18%      61.41%      56.78%
+Glass          62.83%      82.17%      71.21%      72.89%
+HDPEM          50.00%      82.91%      62.38%      69.98%
+PET            57.31%      65.08%      60.95%      53.95%
+
+🔍 ANALYSIS
+--------------------------------------------------
+Best performing class: Glass (F1: 71.21%)
+Worst performing class: PET (F1: 60.95%)
+
+💡 OBSERVATIONS
+--------------------------------------------------
+1. Model shows reasonable detection capability with custom neck/head
+2. Objectness scores are well-calibrated (max ~0.98)
+3. Class scores could be improved with more training
+4. Lower confidence threshold (0.1) recommended for inference
+
+🚀 FUTURE IMPROVEMENTS
+--------------------------------------------------
+1. Train for more epochs with data augmentation
+2. Use larger backbone (YOLOv8m or YOLOv8l)
+3. Implement hard negative mining
+4. Add more diverse training data
+5. Fine-tune confidence threshold per class
+
+======================================================================
