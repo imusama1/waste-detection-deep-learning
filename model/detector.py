@@ -1,5 +1,3 @@
-"""Complete Custom Detector Model."""
-
 import torch
 import torch.nn as nn
 from .backbone import YOLOv8Backbone
@@ -10,7 +8,7 @@ from .head import MultiScaleHead
 class CustomDetector(nn.Module):
     """Complete object detection model."""
     
-    def __init__(self, num_classes=4, backbone_size='s', freeze_backbone=True):
+    def __init__(self, num_classes=4, backbone_size='m', freeze_backbone=True):
         super().__init__()
         self.num_classes = num_classes
         
@@ -24,7 +22,7 @@ class CustomDetector(nn.Module):
     def _print_info(self, backbone_size, freeze_backbone):
         total = sum(p.numel() for p in self.parameters())
         trainable = sum(p.numel() for p in self.parameters() if p.requires_grad)
-        print(f"✅ CustomDetector initialized:")
+        print(f"   CustomDetector initialized:")
         print(f"   Backbone: YOLOv8{backbone_size} ({'frozen' if freeze_backbone else 'trainable'})")
         print(f"   Neck: ABFP | Head: Decoupled Attention")
         print(f"   Params: {total:,} total, {trainable:,} trainable")

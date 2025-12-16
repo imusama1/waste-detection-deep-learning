@@ -107,7 +107,7 @@ class CrossScaleConnection(nn.Module):
 class CustomNeck_ABFP(nn.Module):
     """Adaptive Bidirectional Feature Pyramid Network."""
     
-    def __init__(self, in_channels=[128, 256, 512], out_channels=256):
+    def __init__(self, in_channels=[192, 384, 576], out_channels=256):
         super().__init__()
         
         # Lateral connections

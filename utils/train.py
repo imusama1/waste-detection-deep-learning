@@ -10,7 +10,9 @@ from tqdm import tqdm
 
 from config import *
 from models import CustomDetector
-from utils import WasteDataset, collate_fn, DetectionLoss, plot_training_history
+from dataset import WasteDataset, collate_fn
+from loss import DetectionLoss
+from utils import plot_training_history
 
 
 class Trainer:
@@ -76,14 +78,14 @@ class Trainer:
         return total_loss / len(self.val_loader) if len(self.val_loader) > 0 else 0
     
     def train(self, epochs):
-        print(f"\n🚀 Training for {epochs} epochs...")
+        print(f"\nTraining for {epochs} epochs...")
         scheduler = self._create_scheduler(epochs)
         
         for epoch in range(epochs):
             print(f"\n{'='*50}\nEpoch {epoch+1}/{epochs}\n{'='*50}")
             
             if epoch == UNFREEZE_EPOCH:
-                print("\n🔓 Unfreezing backbone...")
+                print("\nUnfreezing backbone...")
                 self.model.unfreeze_backbone('last')
                 params = [p for p in self.model.parameters() if p.requires_grad]
                 self.optimizer = torch.optim.AdamW(params, lr=5e-4, weight_decay=WEIGHT_DECAY)
@@ -106,13 +108,13 @@ class Trainer:
                     'history': self.history,
                     'backbone_size': BACKBONE_SIZE
                 }, MODEL_SAVE_PATH)
-                print(f"💾 Saved best model")
+                print(f"Saved best model")
         
         return self.history
 
 
 def main():
-    print(f"🖥️ Device: {DEVICE}")
+    print(f"Device: {DEVICE}")
     
     # Prepare data
     extensions = ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']
@@ -156,7 +158,7 @@ def main():
     # Cleanup
     shutil.rmtree('temp_train')
     shutil.rmtree('temp_val')
-    print("\n🎉 Done!")
+    print("\nDone!")
 
 
 if __name__ == "__main__":

@@ -25,7 +25,8 @@ class FocalLoss(nn.Module):
 class DetectionLoss(nn.Module):
     """Combined detection loss."""
     
-    def __init__(self, num_classes=4, cls_weight=1.5, reg_weight=5.0, obj_weight=1.0):
+    # UPDATED: Changed cls_weight to 2.5 and obj_weight to 0.5
+    def __init__(self, num_classes=4, cls_weight=2.5, reg_weight=5.0, obj_weight=0.5):
         super().__init__()
         self.num_classes = num_classes
         self.focal_loss = FocalLoss()
@@ -72,7 +73,9 @@ class DetectionLoss(nn.Module):
                     reg_mask[b, 0, y, x] = 1.0
             
             total_cls += self.focal_loss(cls_pred, cls_target)
-            bce = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([2.0], device=device))
+            
+            # UPDATED: Reduced pos_weight from 2.0 to 1.5
+            bce = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([1.5], device=device))
             total_obj += bce(obj_pred, obj_target)
             
             if reg_mask.sum() > 0:

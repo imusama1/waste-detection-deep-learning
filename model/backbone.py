@@ -15,7 +15,8 @@ class YOLOv8Backbone(nn.Module):
         'x': [320, 640, 640]
     }
     
-    def __init__(self, model_size='s', freeze=True):
+    # UPDATED: Changed default model_size from 's' to 'm'
+    def __init__(self, model_size='m', freeze=True):
         super().__init__()
         
         from ultralytics import YOLO
@@ -36,17 +37,17 @@ class YOLOv8Backbone(nn.Module):
     def freeze(self):
         for param in self.parameters():
             param.requires_grad = False
-        print("   🔒 Backbone frozen")
+        print("   Backbone frozen")
     
     def unfreeze(self, stages='all'):
         if stages == 'all':
             for param in self.parameters():
                 param.requires_grad = True
-            print("   🔓 Backbone fully unfrozen")
+            print("   Backbone fully unfrozen")
         elif stages == 'last':
             for param in self.stage3.parameters():
                 param.requires_grad = True
-            print("   🔓 Backbone stage3 unfrozen")
+            print("   Backbone stage3 unfrozen")
     
     def forward(self, x):
         p3 = self.stage1(x)

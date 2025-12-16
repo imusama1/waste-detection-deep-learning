@@ -8,7 +8,7 @@ from PIL import Image
 
 import sys
 sys.path.append('..')
-from config import CLASS_NAMES, COLORS
+from config import CLASS_NAMES, COLORS, IMG_SIZE
 
 
 def visualize_prediction(model, image_path, device, conf_thresh=0.25, save_path=None):
@@ -16,7 +16,7 @@ def visualize_prediction(model, image_path, device, conf_thresh=0.25, save_path=
     img = Image.open(image_path).convert("RGB")
     orig_w, orig_h = img.size
     
-    img_resized = img.resize((640, 640))
+    img_resized = img.resize((IMG_SIZE, IMG_SIZE))
     img_tensor = torch.from_numpy(np.array(img_resized)).permute(2, 0, 1).float() / 255.0
     mean = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
     std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
@@ -31,8 +31,8 @@ def visualize_prediction(model, image_path, device, conf_thresh=0.25, save_path=
     scores = results['scores'].cpu().numpy()
     labels = results['labels'].cpu().numpy()
     
-    boxes[:, [0, 2]] *= orig_w / 640
-    boxes[:, [1, 3]] *= orig_h / 640
+    boxes[:, [0, 2]] *= orig_w / IMG_SIZE
+    boxes[:, [1, 3]] *= orig_h / IMG_SIZE
     
     fig, ax = plt.subplots(1, figsize=(12, 8))
     ax.imshow(img)
@@ -40,7 +40,7 @@ def visualize_prediction(model, image_path, device, conf_thresh=0.25, save_path=
     for box, score, label in zip(boxes, scores, labels):
         x1, y1, x2, y2 = box
         rect = patches.Rectangle((x1, y1), x2-x1, y2-y1, linewidth=3,
-                                  edgecolor=COLORS[int(label)], facecolor='none')
+                                 edgecolor=COLORS[int(label)], facecolor='none')
         ax.add_patch(rect)
         ax.text(x1, y1-10, f"{CLASS_NAMES[int(label)]}: {score:.2f}",
                 color='white', fontsize=12,
